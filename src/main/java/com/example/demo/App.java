@@ -25,13 +25,19 @@ public class App
     public static void doIt() {
         final Scheme scheme = new Scheme(new SecureRandom(), 5, 3);
         final byte[] secret = "hello there".getBytes(StandardCharsets.UTF_8);
-        final Map<Integer, byte[]> parts = scheme.split(secret);
+        final Map<Integer, byte[]> parts = scheme.split(secret); 
         final byte[] recovered = scheme.join(parts);
         System.out.println(new String(recovered, StandardCharsets.UTF_8));
       }
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
-        doIt();
+        SetPixels setpixel = new SetPixels();
+        try{
+            setpixel.main();
+        } catch(Exception e){
+
+        }
+        
     }
 }
