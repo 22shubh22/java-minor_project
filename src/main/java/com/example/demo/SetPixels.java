@@ -9,8 +9,6 @@ import javax.imageio.ImageIO;
 
 import com.codahale.shamir.Scheme;
 
-import org.w3c.dom.xpath.XPathNSResolver;
-
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Map;
@@ -19,18 +17,22 @@ public class SetPixels {
    
    public void main()throws IOException {
       System.out.println("Started");
+      
+      final Scheme scheme = new Scheme(new SecureRandom(), 6, 3);
+      
       //Reading the image
-      File file= new File("C:\\Users\\USER\\Desktop\\java_project\\test1.png");
+      File file= new File("C:\\Users\\USER\\Desktop\\java_project\\smvdu.png");
       BufferedImage img = ImageIO.read(file); 
       int width = img.getWidth();
       int height = img.getHeight(); 
-      BufferedImage imgs[];
-      imgs = new BufferedImage[6];
+      BufferedImage imgs[], resurrected_img;
+      imgs = new BufferedImage[scheme.n()];
 
-      final Scheme scheme = new Scheme(new SecureRandom(), 6, 3);
+      resurrected_img = new BufferedImage(width, height, 
+                                    BufferedImage.TYPE_INT_RGB);
 
-      for (int y = 0; y < 1/*img.getHeight()*/; y++) {
-         for (int x = 0; x < 1/*img.getWidth()*/; x++) {
+      for (int y = 0; y < img.getHeight(); y++) {
+         for (int x = 0; x < img.getWidth(); x++) {
             System.out.println("Inside outer loop");
             //Retrieving contents of a pixel
             int pixel = img.getRGB(x,y);
@@ -107,12 +109,33 @@ public class SetPixels {
                //Setting new Color object to the image
                imgs[i].setRGB(x, y, color.getRGB());
             }
+
+            final byte[] recovered_red = scheme.join(parts_red);
+            final byte[] recovered_green = scheme.join(parts_green);
+            final byte[] recovered_blue = scheme.join(parts_blue);
+            String reRed = new String(recovered_red, StandardCharsets.UTF_8);
+            String reGreen = new String(recovered_green, StandardCharsets.UTF_8);
+            String reBlue = new String(recovered_blue, StandardCharsets.UTF_8);
+            int recoveredintRed = Integer.parseInt(reRed);
+            int recoveredintGreen = Integer.parseInt(reGreen);
+            int recoveredintBlue = Integer.parseInt(reBlue);
+
+            Color recovered_color = new Color(recoveredintRed, recoveredintGreen, recoveredintBlue);
+            resurrected_img.setRGB(x,y, recovered_color.getRGB());
+
          }
       }
-      System.out.println("outside loop");
-      //Saving the modified image
-      file = new File("C:\\Users\\USER\\Desktop\\java_project\\new_demo" + "1" + ".png");
-      ImageIO.write(imgs[1], "png", file);
-      System.out.println("Done...");
+      for(int i=0; i<scheme.n();i++)
+      {
+         file = new File("C:\\Users\\USER\\Desktop\\java_project\\new_demo" + Integer.toString(i) + ".png");
+         ImageIO.write(imgs[i], "png", file);
+      }
+      
+
+      //Resurrecting Image from made images
+      file = new File("C:\\Users\\USER\\Desktop\\java_project\\resurrected.png");
+      ImageIO.write(resurrected_img, "png", file);
+
+      System.out.println("Done");
    }
 }
