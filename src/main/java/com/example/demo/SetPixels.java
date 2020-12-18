@@ -17,6 +17,7 @@ public class SetPixels {
    
    public void main()throws IOException {
       System.out.println("Started");
+      final long startTime = System.currentTimeMillis();
       
       final Scheme scheme = new Scheme(new SecureRandom(), 6, 3);
       
@@ -137,5 +138,7 @@ public class SetPixels {
       ImageIO.write(resurrected_img, "png", file);
 
       System.out.println("Done");
+      final long endTime = System.currentTimeMillis();
+      System.out.println("Total execution time: " + (endTime - startTime));
    }
 }
